@@ -1,19 +1,19 @@
 from fastapi import FastAPI
-from app.database import engine, Base
-from app.models import DeforestedZone  # Ahora no hay circularidad
-from app.endpoints import router
+from .database import engine, Base
+from . import models
+from .endpoints import router
 
 app = FastAPI(
-    title="Deforestation Zones API",
-    description="API for managing deforested zones with geospatial data",
+    title="API de Monitoreo de Deforestación",
+    description="API para el registro y monitoreo de zonas deforestadas",
     version="1.0.0",
 )
 
-# Crea las tablas de la base de datos
+# Crear tablas en la base de datos
 Base.metadata.create_all(bind=engine)
 
 app.include_router(router, prefix="/api/v1")
 
 @app.get("/")
 def read_root():
-    return {"message": "Deforestation Zones API"}
+    return {"message": "API de Monitoreo de Deforestación"}

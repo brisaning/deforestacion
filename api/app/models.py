@@ -1,16 +1,32 @@
-from sqlalchemy import Column, Integer, String, Float, Date
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from geoalchemy2 import Geometry
-from app.database import Base  # Ahora Base está definido en database.py
+from app.database import Base
 
-class DeforestedZone(Base):
-    __tablename__ = "deforested_zones"
+class Departamento(Base):
+    __tablename__ = "departamentos"
     
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    description = Column(String)
-    area_hectares = Column(Float)
-    date_detected = Column(Date)
+    nombre = Column(String, unique=True, index=True)
+    
+    zonas = relationship("ZonaDeforestada", back_populates="departamento")
+
+class TipoProceso(Base):
+    __tablename__ = "tipos_proceso"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String, unique=True, index=True)
+    
+    zonas = relationship("ZonaDeforestada", back_populates="tipo_proceso")
+
+class ZonaDeforestada(Base):
+    __tablename__ = "zonas_deforestadas"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    nombre_zona = Column(String, index=True)
+    tipo_proceso_id = Column(Integer, ForeignKey("tipos_proceso.id"))
+    departamento_id = Column(Integer, ForeignKey("departamentos.id"))
     geometry = Column(Geometry(geometry_type='POLYGON', srid=3116))
     
-    def __repr__(self):
-        return f"<DforestedZone {self.name}>"
+    tipo_proceso = relationship("TipoProceso", back_populates="zonas")
+    departamento = relationship("Departamento", back_populates="zonas")

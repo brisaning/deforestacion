@@ -1,52 +1,146 @@
 from sqlalchemy.orm import Session
-from geoalchemy2.functions import ST_GeomFromGeoJSON
-from app.models import DeforestedZone
-from app.schemas import DeforestedZoneCreate, DeforestedZoneUpdate
+from geoalchemy2 import WKTElement
+from . import models, schemas
 
-def get_deforested_zone(db: Session, zone_id: int):
-    return db.query(DeforestedZone).filter(DeforestedZone.id == zone_id).first()
+# CRUD para Departamentos
+def get_departamento(db: Session, departamento_id: int):
+    return db.query(models.Departamento).filter(models.Departamento.id == departamento_id).first()
 
-def get_deforested_zones(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(DeforestedZone).offset(skip).limit(limit).all()
+def get_departamento_by_nombre(db: Session, nombre: str):
+    return db.query(models.Departamento).filter(models.Departamento.nombre == nombre).first()
 
-def create_deforested_zone(db: Session, zone: DeforestedZoneCreate):
-    geom = ST_GeomFromGeoJSON(str(zone.geometry), srid=3116)
+def get_departamentos(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Departamento).offset(skip).limit(limit).all()
+
+def create_departamento(db: Session, departamento: schemas.DepartamentoCreate):
+    db_departamento = models.Departamento(nombre=departamento.nombre)
+    db.add(db_departamento)
+    db.commit()
+    db.refresh(db_departamento)
+    return db_departamento
+
+def update_departamento(db: Session, departamento_id: int, departamento: schemas.DepartamentoCreate):
+    db_departamento = get_departamento(db, departamento_id)
+    if db_departamento:
+        db_departamento.nombre = departamento.nombre
+        db.commit()
+        db.refresh(db_departamento)
+    return db_departamento
+
+def delete_departamento(db: Session, departamento_id: int):
+    db_departamento = get_departamento(db, departamento_id)
+    if db_departamento:
+        db.delete(db_departamento)
+        db.commit()
+    return db_departamento
+
+# CRUD para Tipos de Proceso
+def get_tipo_proceso(db: Session, tipo_proceso_id: int):
+    return db.query(models.TipoProceso).filter(models.TipoProceso.id == tipo_proceso_id).first()
+
+def get_tipo_proceso_by_nombre(db: Session, nombre: str):
+    return db.query(models.TipoProceso).filter(models.TipoProceso.nombre == nombre).first()
+
+def get_tipos_proceso(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.TipoProceso).offset(skip).limit(limit).all()
+
+def create_tipo_proceso(db: Session, tipo_proceso: schemas.TipoProcesoCreate):
+    db_tipo = models.TipoProceso(nombre=tipo_proceso.nombre)
+    db.add(db_tipo)
+    db.commit()
+    db.refresh(db_tipo)
+    return db_tipo
+
+def update_tipo_proceso(db: Session, tipo_proceso_id: int, tipo_proceso: schemas.TipoProcesoCreate):
+    db_tipo = get_tipo_proceso(db, tipo_proceso_id)
+    if db_tipo:
+        db_tipo.nombre = tipo_proceso.nombre
+        db.commit()
+        db.refresh(db_tipo)
+    return db_tipo
+
+def delete_tipo_proceso(db: Session, tipo_proceso_id: int):
+    db_tipo = get_tipo_proceso(db, tipo_proceso_id)
+    if db_tipo:
+        db.delete(db_tipo)
+        db.commit()
+    return db_tipo
+
+# CRUD para Zonas Deforestadas
+def get_zona_deforestada(db: Session, zona_id: int):
+    return db.query(models.ZonaDeforestada).filter(models.ZonaDeforestada.id == zona_id).first()
+
+def get_zonas_deforestadas(
+    db: Session, 
+    skip: int = 0, 
+    limit: int = 100,
+    departamento: str = None,
+    tipo_proceso: str = None
+):
+    query = db.query(models.ZonaDeforestada)
     
-    db_zone = DeforestedZone(
-        name=zone.name,
-        description=zone.description,
-        area_hectares=zone.area_hectares,
-        date_detected=zone.date_detected,
+    if departamento:
+        query = query.join(models.Departamento).filter(models.Departamento.nombre == departamento)
+    if tipo_proceso:
+        query = query.join(models.TipoProceso).filter(models.TipoProceso.nombre == tipo_proceso)
+    
+    return query.offset(skip).limit(limit).all()
+
+def create_zona_deforestada(db: Session, zona: schemas.ZonaDeforestadaCreate):
+    # Verificar existencia de departamento y tipo de proceso
+    departamento = get_departamento_by_nombre(db, zona.departamento)
+    if not departamento:
+        raise ValueError(f"Departamento {zona.departamento} no existe")
+    
+    tipo_proceso = get_tipo_proceso_by_nombre(db, zona.tipo_proceso)
+    if not tipo_proceso:
+        raise ValueError(f"Tipo de proceso {zona.tipo_proceso} no existe")
+    
+    # Convertir WKT a geometría PostGIS
+    geom = WKTElement(zona.geom, srid=3116)
+    
+    db_zona = models.ZonaDeforestada(
+        nombre_zona=zona.nombre_zona,
+        tipo_proceso_id=tipo_proceso.id,
+        departamento_id=departamento.id,
         geometry=geom
     )
     
-    db.add(db_zone)
+    db.add(db_zona)
     db.commit()
-    db.refresh(db_zone)
-    return db_zone
+    db.refresh(db_zona)
+    return db_zona
 
-def update_deforested_zone(db: Session, zone_id: int, zone: DeforestedZoneUpdate):
-    db_zone = get_deforested_zone(db, zone_id)
-    if not db_zone:
+def update_zona_deforestada(db: Session, zona_id: int, zona: schemas.ZonaDeforestadaUpdate):
+    db_zona = get_zona_deforestada(db, zona_id)
+    if not db_zona:
         return None
     
-    updates = {k: v for k, v in zone.dict().items() if v is not None}
+    if zona.nombre_zona is not None:
+        db_zona.nombre_zona = zona.nombre_zona
     
-    if 'geometry' in updates:
-        updates['geometry'] = ST_GeomFromGeoJSON(str(updates['geometry']), srid=3116)
+    if zona.tipo_proceso is not None:
+        tipo_proceso = get_tipo_proceso_by_nombre(db, zona.tipo_proceso)
+        if not tipo_proceso:
+            raise ValueError(f"Tipo de proceso {zona.tipo_proceso} no existe")
+        db_zona.tipo_proceso_id = tipo_proceso.id
     
-    for key, value in updates.items():
-        setattr(db_zone, key, value)
+    if zona.departamento is not None:
+        departamento = get_departamento_by_nombre(db, zona.departamento)
+        if not departamento:
+            raise ValueError(f"Departamento {zona.departamento} no existe")
+        db_zona.departamento_id = departamento.id
+    
+    if zona.geom is not None:
+        db_zona.geometry = WKTElement(zona.geom, srid=3116)
     
     db.commit()
-    db.refresh(db_zone)
-    return db_zone
+    db.refresh(db_zona)
+    return db_zona
 
-def delete_deforested_zone(db: Session, zone_id: int):
-    db_zone = get_deforested_zone(db, zone_id)
-    if not db_zone:
-        return None
-    
-    db.delete(db_zone)
-    db.commit()
-    return db_zone
+def delete_zona_deforestada(db: Session, zona_id: int):
+    db_zona = get_zona_deforestada(db, zona_id)
+    if db_zona:
+        db.delete(db_zona)
+        db.commit()
+    return db_zona
