@@ -25,4 +25,4 @@ class DeforestedZone(DeforestedZoneBase):
     geometry: dict  # GeoJSON representation
     
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -6,4 +6,5 @@ pydantic==2.11.4
 psycopg2-binary==2.9.10
 geoalchemy2==0.17.1
 shapely==2.1.0
+geojson-pydantic==2.0.0
 
