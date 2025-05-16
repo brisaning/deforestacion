@@ -1,8 +1,6 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Dict
 from datetime import date
-from geojson_pydantic import Polygon
-from geojson_pydantic.geometries import Polygon
 
 class DeforestedZoneBase(BaseModel):
     name: str
@@ -11,18 +9,18 @@ class DeforestedZoneBase(BaseModel):
     date_detected: date
 
 class DeforestedZoneCreate(DeforestedZoneBase):
-    geometry: Polygon = Field(..., description="Geometría en formato GeoJSON (EPSG:3116)")
+    geometry: Dict  # Usamos Dict en lugar de Polygon para evitar dependencias
 
 class DeforestedZoneUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     area_hectares: Optional[float] = Field(None, gt=0)
     date_detected: Optional[date] = None
-    geometry: Optional[Polygon] = None
+    geometry: Optional[Dict] = None
 
 class DeforestedZone(DeforestedZoneBase):
     id: int
-    geometry: dict  # GeoJSON representation
+    geometry: Dict
     
     class Config:
         from_attributes = True
