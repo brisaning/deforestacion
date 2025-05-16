@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, Date
 from geoalchemy2 import Geometry
-from app.database import Base
+from app.database import Base  # Ahora Base está definido en database.py
 
 class DeforestedZone(Base):
     __tablename__ = "deforested_zones"
@@ -13,4 +13,4 @@ class DeforestedZone(Base):
     geometry = Column(Geometry(geometry_type='POLYGON', srid=3116))
     
     def __repr__(self):
-        return f"<DeforestedZone {self.name}>"
+        return f"<DforestedZone {self.name}>"

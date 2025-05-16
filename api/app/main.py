@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database import engine, Base
-from app.models import DeforestedZone
+from app.models import DeforestedZone  # Ahora no hay circularidad
 from app.endpoints import router
 
 app = FastAPI(
@@ -9,7 +9,7 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Create database tables
+# Crea las tablas de la base de datos
 Base.metadata.create_all(bind=engine)
 
 app.include_router(router, prefix="/api/v1")
