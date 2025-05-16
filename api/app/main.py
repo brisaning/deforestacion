@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from .database import engine, Base
-from . import models
-from .endpoints import router
+from app.database import engine, Base
+from app import models
+from app.endpoints import router
 
 app = FastAPI(
     title="Deforestation Zones API",
