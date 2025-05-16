@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 from geoalchemy2.functions import ST_Transform, ST_GeomFromGeoJSON
 from shapely.geometry import shape
-import models
-import schemas
+from app.models import DeforestedZone
+from app.schemas import DeforestedZoneCreate, DeforestedZoneUpdate
+from app.database import Session
 
 def get_deforested_zone(db: Session, zone_id: int):
     return db.query(models.DeforestedZone).filter(models.DeforestedZone.id == zone_id).first()

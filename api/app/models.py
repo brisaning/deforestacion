@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, Date
 from geoalchemy2 import Geometry
-from .database import Base
+from app.database import Base
 
 class DeforestedZone(Base):
     __tablename__ = "deforested_zones"
