@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-empty-layout',
-  imports: [],
+  imports: [RouterOutlet],
   templateUrl: './empty-layout.component.html',
   styleUrl: './empty-layout.component.scss'
 })
