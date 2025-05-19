@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, Input } from '@angular/core';
 import * as L from 'leaflet';
 
 @Component({
@@ -9,12 +9,19 @@ import * as L from 'leaflet';
 })
 export class MapMainComponent implements AfterViewInit  {
 
+  @Input() initialCoords: L.LatLngExpression = [4.6, -74.1]; // Centro de Colombia por defecto
+  @Input() initialZoom = 6;
+  @Input() editable = false;
+  @Input() existingPolygon?: L.LatLngExpression[];
+  @Input() showArea = true;
+  @Input() maxAreaKm2?: number;
+  
   private map: any;
 
   private initMap(): void {
     this.map = L.map('map', {
-      center: [ 39.8282, -98.5795 ],
-      zoom: 3
+      center: this.initialCoords,
+      zoom: this.initialZoom,
     });
 
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
