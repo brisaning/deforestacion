@@ -15,12 +15,7 @@ export class MapMainComponent implements AfterViewInit  {
   @Input() existingPolygon?: L.LatLngExpression[];
   @Input() showArea = true;
   @Input() maxAreaKm2?: number;
-  @Input() polygonCoords: L.LatLngExpression[] = [
-    [4.656, -74.115],
-    [4.656, -74.100],
-    [4.640, -74.100],
-    [4.640, -74.115]
-  ];
+  @Input() polygonCoords: L.LatLngExpression[] = [];
 
 
   
@@ -46,7 +41,15 @@ export class MapMainComponent implements AfterViewInit  {
     }
   }
 
-  constructor() { }
+  constructor() {
+    this.polygonCoords = [
+    [4.656, -74.115],
+    [4.656, -74.100],
+    [4.640, -74.100],
+    [4.640, -74.115],
+    [4.630, -74.145]
+  ]
+  }
 
   ngAfterViewInit(): void {
     this.initMap();
