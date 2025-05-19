@@ -28,5 +28,5 @@ class ZonaDeforestada(Base):
     departamento_id = Column(Integer, ForeignKey("departamentos.id"))
     geometry = Column(Geometry(geometry_type='POLYGON', srid=3116))
     
-    tipo_proceso = relationship("TipoProceso", back_populates="zonas")
-    departamento = relationship("Departamento", back_populates="zonas")
+    tipo_proceso = relationship("TipoProceso", back_populates="zonas", lazy="joined")
+    departamento = relationship("Departamento", back_populates="zonas", lazy="joined")

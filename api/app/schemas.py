@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional, List
 from datetime import date
 
@@ -37,6 +37,12 @@ class ZonaDeforestadaBase(BaseModel):
 class ZonaDeforestadaCreate(ZonaDeforestadaBase):
     geom: str  # WKT format for polygon in EPSG:3116
 
+    @validator('geom')
+    def validate_geom(cls, v):
+        if not v.startswith('POLYGON((') or not v.endswith('))'):
+            raise ValueError('Formato de geometría inválido. Debe ser WKT POLYGON')
+        return v
+
 class ZonaDeforestadaUpdate(BaseModel):
     nombre_zona: Optional[str] = None
     tipo_proceso: Optional[str] = None
@@ -45,8 +51,9 @@ class ZonaDeforestadaUpdate(BaseModel):
 
 class ZonaDeforestada(ZonaDeforestadaBase):
     id: int
-    tipo_proceso_id: int
-    departamento_id: int
     
     class Config:
         from_attributes = True
+        json_encoders = {
+            # Agregar conversores si es necesario
+        }

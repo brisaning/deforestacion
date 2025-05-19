@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from geoalchemy2 import WKTElement
 from . import models, schemas
@@ -87,29 +88,40 @@ def get_zonas_deforestadas(
     return query.offset(skip).limit(limit).all()
 
 def create_zona_deforestada(db: Session, zona: schemas.ZonaDeforestadaCreate):
-    # Verificar existencia de departamento y tipo de proceso
-    departamento = get_departamento_by_nombre(db, zona.departamento)
+    # Verificar existencia
+    departamento = db.query(models.Departamento).filter(
+        models.Departamento.nombre == zona.departamento
+    ).first()
     if not departamento:
         raise ValueError(f"Departamento {zona.departamento} no existe")
     
-    tipo_proceso = get_tipo_proceso_by_nombre(db, zona.tipo_proceso)
+    tipo_proceso = db.query(models.TipoProceso).filter(
+        models.TipoProceso.nombre == zona.tipo_proceso
+    ).first()
     if not tipo_proceso:
         raise ValueError(f"Tipo de proceso {zona.tipo_proceso} no existe")
     
-    # Convertir WKT a geometría PostGIS
-    geom = WKTElement(zona.geom, srid=3116)
-    
+    # Crear la zona
     db_zona = models.ZonaDeforestada(
         nombre_zona=zona.nombre_zona,
         tipo_proceso_id=tipo_proceso.id,
         departamento_id=departamento.id,
-        geometry=geom
+        #geometry=func.ST_GeomFromText(zona.geom, 3116)
+        geometry=WKTElement(zona.geom, srid=3116)
     )
     
     db.add(db_zona)
     db.commit()
     db.refresh(db_zona)
-    return db_zona
+    
+    # Devolver los nombres en lugar de los objetos
+    return {
+        "id": db_zona.id,
+        "nombre_zona": db_zona.nombre_zona,
+        "tipo_proceso": tipo_proceso.nombre,  # Nombre en lugar de objeto
+        "departamento": departamento.nombre,  # Nombre en lugar de objeto
+        "geom": zona.geom
+    }
 
 def update_zona_deforestada(db: Session, zona_id: int, zona: schemas.ZonaDeforestadaUpdate):
     db_zona = get_zona_deforestada(db, zona_id)

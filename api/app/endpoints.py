@@ -79,7 +79,8 @@ def eliminar_proceso(proceso_id: int, db: Session = Depends(get_db)):
 @router.post("/zonas-deforestadas/", response_model=schemas.ZonaDeforestada)
 def crear_zona_deforestada(zona: schemas.ZonaDeforestadaCreate, db: Session = Depends(get_db)):
     try:
-        return crud.create_zona_deforestada(db=db, zona=zona)
+        db_zona = crud.create_zona_deforestada(db=db, zona=zona)
+        return db_zona
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
