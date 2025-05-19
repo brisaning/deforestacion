@@ -17,15 +17,28 @@ export class MapMainComponent implements AfterViewInit  {
   @Input() maxAreaKm2?: number;
   @Input() polygonCoords: L.LatLngExpression[] = [];
 
-
-  
   private map: any;
   private polygonLayer: any;
+
+  constructor() {
+    let coords: any = [
+    [4.656, -74.115],
+    [4.656, -74.100],
+    [4.640, -74.100],
+    [4.640, -74.115],
+    [4.630, -74.145]
+  ];
+    this.updatePolygon(coords);
+  }
+
+  ngAfterViewInit(): void {
+    this.initMap();
+  }
 
   private initMap(): void {
     this.map = L.map('map', {
       center: this.initialCoords,
-      zoom: this.initialZoom,
+      zoom: this.initialZoom
     });
 
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -41,19 +54,9 @@ export class MapMainComponent implements AfterViewInit  {
     }
   }
 
-  constructor() {
-    this.polygonCoords = [
-    [4.656, -74.115],
-    [4.656, -74.100],
-    [4.640, -74.100],
-    [4.640, -74.115],
-    [4.630, -74.145]
-  ]
-  }
-
-  ngAfterViewInit(): void {
-    this.initMap();
-  }
+  updatePolygon(cords: any): void {
+  this.polygonCoords = cords;
+}
 
   drawPolygon(coords: L.LatLngExpression[]): void {
     if (this.polygonLayer) {
