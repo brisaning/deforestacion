@@ -10,8 +10,12 @@ export const routes: Routes = [
             {
                 path: '',
                 loadComponent: () => import('./components/home/home-main/home-main.component').then(m => m.HomeMainComponent)
+            },
+            {
+                path: 'map',
+                loadComponent: () => import('./components/map/map-main/map-main.component').then(m => m.MapMainComponent)
             }
-            ]
+        ]
     },
     { path: '',
         component: EmptyLayoutComponent,
