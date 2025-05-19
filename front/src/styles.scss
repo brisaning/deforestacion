@@ -1,1 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+$enable-shadows: true;
+$prefix: "fletx-";
+
+// Then import Bootstrap
+@use "../node_modules/bootstrap/scss/bootstrap";
+
+.bd-magin > .btn, .bd-magin > .btn-group {
+    margin: .25rem .125rem;
+}
