@@ -25,25 +25,20 @@ export class MapMainComponent implements AfterViewInit  {
   constructor(
     private zonaService: ZonaService
   ) {
-    let coords: any = [
-    [4.656, -74.115],
-    [4.656, -74.100],
-    [4.640, -74.100],
-    [4.640, -74.115],
-    [4.630, -74.145]
-  ];
 
-  console.log(coords);
-  
-  
+    this.zonaService.getZona(10).subscribe((response: any) => {
 
-  this.zonaService.getZona(1).subscribe((zona: any) => {
-    let zonacambiada = this.extractCoordinatesForLeaflet(zona.geom);
-    
-    console.log(zonacambiada);
-    this.updatePolygon(zonacambiada);
+      console.log(response.geom);
+
+      let zona = this.extractCoordinatesForLeaflet(response.geom);
+      console.log(zona);
+      this.updatePolygon(zona);
     });
     
+  }
+
+  ngAfterViewInit(): void {
+    this.initMap();
   }
 
   extractCoordinatesForLeaflet(polygonStr: string): L.LatLngExpression[] {
@@ -55,10 +50,6 @@ export class MapMainComponent implements AfterViewInit  {
       .map(([lng, lat]) => [parseFloat(lat), parseFloat(lng)]);
   }
 
-  ngAfterViewInit(): void {
-    this.initMap();
-  }
-
   private initMap(): void {
     this.map = L.map('map', {
       center: this.initialCoords,
@@ -66,7 +57,7 @@ export class MapMainComponent implements AfterViewInit  {
     });
 
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
+      maxZoom: 19,
       minZoom: 3,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     });
@@ -78,9 +69,11 @@ export class MapMainComponent implements AfterViewInit  {
     }
   }
 
-  updatePolygon(cords: any): void {
-  this.polygonCoords = cords;
-}
+  updatePolygon(cords: L.LatLngExpression[]): void {
+    if (cords.length > 0) {
+      this.drawPolygon(cords);
+    }
+  }
 
   drawPolygon(coords: L.LatLngExpression[]): void {
     if (this.polygonLayer) {

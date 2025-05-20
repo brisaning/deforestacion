@@ -9,7 +9,7 @@ import { from, Observable } from 'rxjs';
 export class ZonaService {
   constructor(private api: ApiService) {}
 
-  getZonas(filters?: { departamento?: string, tipo_proceso?: string }): Observable<any> {
+  getZonas(filters?: { departamento?: string, tipo_proceso?: string }): Observable<Zona[]> {
     let endpoint = 'zonas-deforestadas/';
     if (filters) {
       const params = new URLSearchParams();
@@ -21,7 +21,7 @@ export class ZonaService {
     return from(promise);
   }
 
-  getZona(id: number): Observable<any> {
+  getZona(id: number): Observable<Zona> {
     const promise = this.api.get(`zonas-deforestadas/${id}`);
     return from(promise);
   }
