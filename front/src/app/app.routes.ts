@@ -12,11 +12,11 @@ export const routes: Routes = [
                 loadComponent: () => import('./components/home/home-main/home-main.component').then(m => m.HomeMainComponent)
             },
             {
-                path: 'zonas',
+                path: 'mapas',
                 loadComponent: () => import('./components/map/map-main/map-main.component').then(m => m.MapMainComponent)
             },
             {
-                path: 'zonas/:mapId',
+                path: 'mapas/:mapId',
                 loadComponent: () => import('./components/map/map-main/map-main.component').then(m => m.MapMainComponent)
             }
         ]

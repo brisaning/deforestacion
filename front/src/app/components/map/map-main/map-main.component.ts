@@ -105,7 +105,7 @@ export class MapMainComponent implements AfterViewInit  {
         let zona = this.extractCoordinatesForLeaflet(response.geom);
         this.updatePolygon(zona);
       });
-      this.router.navigate(['/zonas', event.target.value]);
+      this.router.navigate(['/mapas', event.target.value]);
     }
   }
 
