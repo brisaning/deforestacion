@@ -12,12 +12,17 @@ export const routes: Routes = [
                 loadComponent: () => import('./components/home/home-main/home-main.component').then(m => m.HomeMainComponent)
             },
             {
-                path: 'map',
+                path: 'zonas',
+                loadComponent: () => import('./components/map/map-main/map-main.component').then(m => m.MapMainComponent)
+            },
+            {
+                path: 'zonas/:mapId',
                 loadComponent: () => import('./components/map/map-main/map-main.component').then(m => m.MapMainComponent)
             }
         ]
     },
-    { path: '',
+    { 
+        path: '',
         component: EmptyLayoutComponent,
         children: [
             { 
@@ -30,4 +35,8 @@ export const routes: Routes = [
             }
         ]
     },
+    {
+        path: '**',
+        redirectTo: ''
+    }
 ];

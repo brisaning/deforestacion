@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, Input } from '@angular/core';
 import * as L from 'leaflet';
 import { ZonaService } from '../../../services/zona.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-map-main',
@@ -23,18 +24,18 @@ export class MapMainComponent implements AfterViewInit  {
   private polygonLayer: any;
 
   constructor(
-    private zonaService: ZonaService
+    private zonaService: ZonaService,
+    private route: ActivatedRoute
   ) {
 
-    this.zonaService.getZona(10).subscribe((response: any) => {
+    const id = this.route.snapshot.params['mapId'];
 
-      console.log(response.geom);
-
-      let zona = this.extractCoordinatesForLeaflet(response.geom);
-      console.log(zona);
-      this.updatePolygon(zona);
-    });
-    
+    if(typeof id !== 'undefined' && id !== null && !isNaN(id)) {
+      this.zonaService.getZona(id).subscribe((response: any) => {
+        let zona = this.extractCoordinatesForLeaflet(response.geom);
+        this.updatePolygon(zona);
+      });
+    }
   }
 
   ngAfterViewInit(): void {
