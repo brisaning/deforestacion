@@ -1,5 +1,6 @@
 import { Component, AfterViewInit, Input } from '@angular/core';
 import * as L from 'leaflet';
+import 'leaflet-draw';
 import { ZonaService } from '../../../services/zona.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgFor } from '@angular/common';
@@ -41,6 +42,7 @@ export class MapMainComponent implements AfterViewInit  {
     if(typeof this.id !== 'undefined' && this.id !== null && !isNaN(this.id)) {
       this.zonaService.getZona(this.id).subscribe((response: any) => {
         let zona = this.extractCoordinatesForLeaflet(response.geom);
+        console.log('zona', zona);
         this.updatePolygon(zona);
       });
     }
@@ -72,15 +74,46 @@ export class MapMainComponent implements AfterViewInit  {
     });
 
     tiles.addTo(this.map);
+    
+    let drawnItems = new L.FeatureGroup();
+    this.map.addLayer(drawnItems);
+
+    let drawControl = new L.Control.Draw({
+      edit: {
+        featureGroup: drawnItems,
+        remove: true
+      },
+      /*draw: {
+        polygon: {
+          allowIntersection: false,
+          showArea: this.showArea,
+          //maxArea: this.maxAreaKm2 ? this.maxAreaKm2 * 1000000 : undefined
+        },
+        polyline: false,
+        rectangle: false,
+        circle: false,
+        marker: false
+      }*/
+    });
+    this.map.addControl(drawControl);
+    
+    this.map.on('draw:created', (e: any) => {
+      const layer = e.layer;
+      drawnItems.addLayer(layer);
+      const coords = layer.toGeoJSON().geometrycoordinates;
+      console.log('Polygon coordinates:', coords);
+      this.updatePolygon(layer.toGeoJSON().coordinates);
+    });
+    
 
     if (this.polygonCoords.length > 0) {
       this.drawPolygon(this.polygonCoords);
     }
   }
 
-  updatePolygon(cords: L.LatLngExpression[]): void {
-    if (cords.length > 0) {
-      this.drawPolygon(cords);
+  updatePolygon(coords: any): void {
+    if (coords.length > 0) {
+      this.drawPolygon(coords);
     }
   }
 
