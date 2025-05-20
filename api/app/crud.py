@@ -148,11 +148,21 @@ def update_zona_deforestada(db: Session, zona_id: int, zona: schemas.ZonaDefores
     
     db.commit()
     db.refresh(db_zona)
-    return db_zona
+    # Devolver los nombres en lugar de los objetos
+    return {
+        "id": db_zona.id,
+        "nombre_zona": db_zona.nombre_zona,
+        "tipo_proceso": tipo_proceso.nombre,  # Nombre en lugar de objeto
+        "departamento": departamento.nombre,  # Nombre en lugar de objeto
+        "geom": zona.geom
+    }
 
 def delete_zona_deforestada(db: Session, zona_id: int):
     db_zona = get_zona_deforestada(db, zona_id)
     if db_zona:
         db.delete(db_zona)
         db.commit()
-    return db_zona
+    # Devolver los nombres en lugar de los objetos
+    return {
+        "id": zona_id,
+    }
