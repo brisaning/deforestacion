@@ -1,11 +1,12 @@
 import { Component, AfterViewInit, Input } from '@angular/core';
 import * as L from 'leaflet';
 import { ZonaService } from '../../../services/zona.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgFor } from '@angular/common';
 
 @Component({
   selector: 'app-map-main',
-  imports: [],
+  imports: [NgFor],
   templateUrl: './map-main.component.html',
   styleUrl: './map-main.component.scss',
   providers: [ZonaService],
@@ -22,16 +23,23 @@ export class MapMainComponent implements AfterViewInit  {
 
   private map: any;
   private polygonLayer: any;
+  public id: number;
+  public zonas: any[] = [];
 
   constructor(
     private zonaService: ZonaService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router,
   ) {
+    this.id = this.route.snapshot.params['mapId'];
 
-    const id = this.route.snapshot.params['mapId'];
+    this.zonaService.getZonas().subscribe((response: any) => {
+      console.log('Zonas:', response);
+      this.zonas = response;
+    });
 
-    if(typeof id !== 'undefined' && id !== null && !isNaN(id)) {
-      this.zonaService.getZona(id).subscribe((response: any) => {
+    if(typeof this.id !== 'undefined' && this.id !== null && !isNaN(this.id)) {
+      this.zonaService.getZona(this.id).subscribe((response: any) => {
         let zona = this.extractCoordinatesForLeaflet(response.geom);
         this.updatePolygon(zona);
       });
@@ -87,6 +95,18 @@ export class MapMainComponent implements AfterViewInit  {
     }).addTo(this.map);
 
     this.map.fitBounds(this.polygonLayer.getBounds());
+  }
+
+  changeZone(event: any): void {
+    if(event.target.value !== null) {
+      console.log('Changing zone to:', event.target.value);
+      const mapId = event.target.value;
+      this.zonaService.getZona(mapId).subscribe((response: any) => {
+        let zona = this.extractCoordinatesForLeaflet(response.geom);
+        this.updatePolygon(zona);
+      });
+      this.router.navigate(['/zonas', event.target.value]);
+    }
   }
 
 }

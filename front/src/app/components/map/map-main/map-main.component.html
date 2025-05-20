@@ -1,5 +1,13 @@
 <div class="map-container">
-  <div class="map-frame">
-    <div id="map"></div>
-  </div>
+    <form>
+        <div class="mb-3">
+            <select class="form-select" (change)="changeZone($event)" aria-label="Default select example">
+                <option selected>Elija una zona</option>
+                <option *ngFor="let zone of zonas" [value]="zone.id" >{{zone.nombre_zona}}</option>
+            </select>
+        </div>
+    </form>
+    <div class="map-frame">
+        <div id="map"></div>
+    </div>
 </div>
