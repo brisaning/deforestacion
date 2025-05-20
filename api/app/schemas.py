@@ -51,6 +51,7 @@ class ZonaDeforestadaUpdate(BaseModel):
 
 class ZonaDeforestada(ZonaDeforestadaBase):
     id: int
+    geom: Optional[str] = None  # Campo para la geometría en WKT
     
     class Config:
         from_attributes = True

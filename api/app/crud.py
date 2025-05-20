@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload  
 from geoalchemy2 import WKTElement
 from . import models, schemas
 
@@ -69,7 +69,26 @@ def delete_tipo_proceso(db: Session, tipo_proceso_id: int):
 
 # CRUD para Zonas Deforestadas
 def get_zona_deforestada(db: Session, zona_id: int):
-    return db.query(models.ZonaDeforestada).filter(models.ZonaDeforestada.id == zona_id).first()
+    # Obtener la zona con las relaciones cargadas
+    zona = db.query(models.ZonaDeforestada).\
+        options(
+            joinedload(models.ZonaDeforestada.tipo_proceso),
+            joinedload(models.ZonaDeforestada.departamento)
+        ).\
+        filter(models.ZonaDeforestada.id == zona_id).\
+        first()
+    
+    if not zona:
+        return None
+    
+    # Convertir a formato compatible con el esquema Pydantic
+    return {
+        "id": zona.id,
+        "nombre_zona": zona.nombre_zona,
+        "tipo_proceso": zona.tipo_proceso.nombre,  # Solo el nombre
+        "departamento": zona.departamento.nombre,  # Solo el nombre
+        "geom": db.scalar(zona.geometry.ST_AsText()) if zona.geometry else None  # Opcional
+    }
 
 def get_zonas_deforestadas(
     db: Session, 
@@ -78,14 +97,39 @@ def get_zonas_deforestadas(
     departamento: str = None,
     tipo_proceso: str = None
 ):
-    query = db.query(models.ZonaDeforestada)
+    # Construir la consulta base con joins para las relaciones
+    query = db.query(
+        models.ZonaDeforestada,
+        models.TipoProceso.nombre.label("tipo_proceso_nombre"),
+        models.Departamento.nombre.label("departamento_nombre")
+    ).join(
+        models.TipoProceso
+    ).join(
+        models.Departamento
+    )
     
+    # Aplicar filtros si existen
     if departamento:
-        query = query.join(models.Departamento).filter(models.Departamento.nombre == departamento)
+        query = query.filter(models.Departamento.nombre == departamento)
     if tipo_proceso:
-        query = query.join(models.TipoProceso).filter(models.TipoProceso.nombre == tipo_proceso)
+        query = query.filter(models.TipoProceso.nombre == tipo_proceso)
     
-    return query.offset(skip).limit(limit).all()
+    # Ejecutar la consulta
+    results = query.offset(skip).limit(limit).all()
+    
+    # Formatear los resultados
+    zonas = []
+    for zona, tipo_nombre, depto_nombre in results:
+        zonas.append({
+            "id": zona.id,
+            "nombre_zona": zona.nombre_zona,
+            "tipo_proceso": tipo_nombre,  # Usamos el nombre ya cargado
+            "departamento": depto_nombre, # Usamos el nombre ya cargado
+            # Si necesitas incluir la geometría:
+            "geom": db.scalar(zona.geometry.ST_AsText()) if zona.geometry else None
+        })
+    
+    return zonas
 
 def create_zona_deforestada(db: Session, zona: schemas.ZonaDeforestadaCreate):
     # Verificar existencia
