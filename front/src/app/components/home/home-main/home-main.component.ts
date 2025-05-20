@@ -1,9 +1,13 @@
 import { Component } from '@angular/core';
-  import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
+import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { AgGridAngular } from 'ag-grid-angular'; // Angular Data Grid Component
 import type { ColDef } from 'ag-grid-community'; // Column Definition Type Interface
+import { ZonaService } from '../../../services/zona.service';
+import { Zona } from '../../../models/zona.model';
+import { ActionButtonComponent } from '../../../common/action-button/action-button.component';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
+  
 
 @Component({
   selector: 'app-home-main',
@@ -13,17 +17,31 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 })
 export class HomeMainComponent {
 
-  rowData = [
-        { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-        { make: "Ford", model: "F-Series", price: 33850, electric: false },
-        { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-    ];
+  public rowData: Zona[] = [];
 
-    // Column Definitions: Defines the columns to be displayed.
-    colDefs: ColDef[] = [
-        { field: "make" },
-        { field: "model" },
-        { field: "price" },
-        { field: "electric" }
-    ];
+  constructor(
+    private zonaService: ZonaService,
+  ) {
+    this.zonaService.getZonas().subscribe((response: Zona[]) => {
+      this.rowData = response;
+    });
+  }
+
+  // Column Definitions: Defines & controls grid columns.
+  colDefs: ColDef<any>[] = [
+    { headerName: "Nombre Zona", field: "nombre_zona" },
+    { headerName: "Departamento", field: "departamento" },
+    { headerName: "Tipo Proceso", field: "tipo_proceso" },
+    { headerName: "Geometría",  field: "geom" },
+    { field: "Acciones", cellRenderer: ActionButtonComponent, 
+      cellRendererParams: {
+        idModal: 'deleteModal'
+      } 
+ }
+  ];
+
+  defaultColDef: ColDef = {
+    flex: 1,
+    editable: true,
+  };
 }

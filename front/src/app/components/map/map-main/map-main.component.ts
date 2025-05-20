@@ -3,6 +3,7 @@ import * as L from 'leaflet';
 import { ZonaService } from '../../../services/zona.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgFor } from '@angular/common';
+import { Zona } from '../../../models/zona.model';
 
 @Component({
   selector: 'app-map-main',
@@ -24,7 +25,7 @@ export class MapMainComponent implements AfterViewInit  {
   private map: any;
   private polygonLayer: any;
   public id: number;
-  public zonas: any[] = [];
+  public zonas: Zona[] = [];
 
   constructor(
     private zonaService: ZonaService,
@@ -34,7 +35,6 @@ export class MapMainComponent implements AfterViewInit  {
     this.id = this.route.snapshot.params['mapId'];
 
     this.zonaService.getZonas().subscribe((response: any) => {
-      console.log('Zonas:', response);
       this.zonas = response;
     });
 
