@@ -1,11 +1,13 @@
 import { Component, AfterViewInit, Input } from '@angular/core';
 import * as L from 'leaflet';
+import { ZonaService } from '../../../services/zona.service';
 
 @Component({
   selector: 'app-map-main',
   imports: [],
   templateUrl: './map-main.component.html',
-  styleUrl: './map-main.component.scss'
+  styleUrl: './map-main.component.scss',
+  providers: [ZonaService],
 })
 export class MapMainComponent implements AfterViewInit  {
 
@@ -20,7 +22,9 @@ export class MapMainComponent implements AfterViewInit  {
   private map: any;
   private polygonLayer: any;
 
-  constructor() {
+  constructor(
+    private zonaService: ZonaService
+  ) {
     let coords: any = [
     [4.656, -74.115],
     [4.656, -74.100],
@@ -28,7 +32,27 @@ export class MapMainComponent implements AfterViewInit  {
     [4.640, -74.115],
     [4.630, -74.145]
   ];
-    this.updatePolygon(coords);
+
+  console.log(coords);
+  
+  
+
+  this.zonaService.getZona(1).subscribe((zona: any) => {
+    let zonacambiada = this.extractCoordinatesForLeaflet(zona.geom);
+    
+    console.log(zonacambiada);
+    this.updatePolygon(zonacambiada);
+    });
+    
+  }
+
+  extractCoordinatesForLeaflet(polygonStr: string): L.LatLngExpression[] {
+    const matches = polygonStr.match(/\(\(([^)]+)\)\)/);
+    if (!matches) return [];
+    
+    return matches[1].split(',')
+      .map(pair => pair.trim().split(' '))
+      .map(([lng, lat]) => [parseFloat(lat), parseFloat(lng)]);
   }
 
   ngAfterViewInit(): void {

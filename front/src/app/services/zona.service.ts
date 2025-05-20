@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { Zona } from '../models/zona.model';
+import { from, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import { Zona } from '../models/zona.model';
 export class ZonaService {
   constructor(private api: ApiService) {}
 
-  getZonas(filters?: { departamento?: string, tipo_proceso?: string }) {
+  getZonas(filters?: { departamento?: string, tipo_proceso?: string }): Observable<any> {
     let endpoint = 'zonas-deforestadas/';
     if (filters) {
       const params = new URLSearchParams();
@@ -16,11 +17,13 @@ export class ZonaService {
       if (filters.tipo_proceso) params.append('tipo_proceso', filters.tipo_proceso);
       endpoint += `?${params.toString()}`;
     }
-    return this.api.get(endpoint);
+    const promise = this.api.get(endpoint);
+    return from(promise);
   }
 
-  getZona(id: number) {
-    return this.api.get(`zonas-deforestadas/${id}`);
+  getZona(id: number): Observable<any> {
+    const promise = this.api.get(`zonas-deforestadas/${id}`);
+    return from(promise);
   }
 
   createZona(zona: Zona) {
