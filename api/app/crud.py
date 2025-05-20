@@ -159,10 +159,18 @@ def update_zona_deforestada(db: Session, zona_id: int, zona: schemas.ZonaDefores
 
 def delete_zona_deforestada(db: Session, zona_id: int):
     db_zona = get_zona_deforestada(db, zona_id)
-    if db_zona:
-        db.delete(db_zona)
-        db.commit()
-    # Devolver los nombres en lugar de los objetos
-    return {
-        "id": zona_id,
+    if not db_zona:
+        return None
+    
+    # Guardar los datos necesarios para la respuesta antes de eliminar
+    response_data = {
+        "id": db_zona.id,
+        "nombre_zona": db_zona.nombre_zona,
+        "tipo_proceso": db_zona.tipo_proceso.nombre,  # Acceder al nombre a través de la relación
+        "departamento": db_zona.departamento.nombre   # Acceder al nombre a través de la relación
     }
+    
+    db.delete(db_zona)
+    db.commit()
+    
+    return response_data
