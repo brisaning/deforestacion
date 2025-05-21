@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, validator
 from typing import Optional, List
 from datetime import date
+from geoalchemy2.elements import WKTElement
 
 # Esquemas para Departamentos
 class DepartamentoBase(BaseModel):
@@ -48,6 +49,12 @@ class ZonaDeforestadaUpdate(BaseModel):
     tipo_proceso: Optional[str] = None
     departamento: Optional[str] = None
     geom: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+        json_encoders = {
+            WKTElement: lambda v: str(v)
+        }
 
 class ZonaDeforestada(ZonaDeforestadaBase):
     id: int

@@ -108,14 +108,21 @@ def leer_zona_deforestada(zona_id: int, db: Session = Depends(get_db)):
     return db_zona
 
 @router.put("/zonas-deforestadas/{zona_id}", response_model=schemas.ZonaDeforestada)
-def actualizar_zona_deforestada(zona_id: int, zona: schemas.ZonaDeforestadaUpdate, db: Session = Depends(get_db)):
+def actualizar_zona_deforestada(
+    zona_id: int,
+    zona_update: schemas.ZonaDeforestadaUpdate,
+    db: Session = Depends(get_db)
+):
     try:
-        db_zona = crud.update_zona_deforestada(db=db, zona_id=zona_id, zona=zona)
+        db_zona = crud.update_zona_deforestada(db=db, zona_id=zona_id, zona_update=zona_update)
         if db_zona is None:
             raise HTTPException(status_code=404, detail="Zona deforestada no encontrada")
         return db_zona
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error al actualizar zona: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 @router.delete("/zonas-deforestadas/{zona_id}", response_model=schemas.ZonaDeforestada)
 def eliminar_zona_deforestada(zona_id: int, db: Session = Depends(get_db)):

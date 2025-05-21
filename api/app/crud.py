@@ -167,38 +167,51 @@ def create_zona_deforestada(db: Session, zona: schemas.ZonaDeforestadaCreate):
         "geom": zona.geom
     }
 
-def update_zona_deforestada(db: Session, zona_id: int, zona: schemas.ZonaDeforestadaUpdate):
-    db_zona = get_zona_deforestada(db, zona_id)
+def update_zona_deforestada(db: Session, zona_id: int, zona_update: schemas.ZonaDeforestadaUpdate):
+    db_zona = db.query(models.ZonaDeforestada).filter(models.ZonaDeforestada.id == zona_id).first()
     if not db_zona:
         return None
+
+    update_data = zona_update.model_dump(exclude_unset=True)
     
-    if zona.nombre_zona is not None:
-        db_zona.nombre_zona = zona.nombre_zona
+    # Actualizar campos simples
+    if 'nombre_zona' in update_data:
+        db_zona.nombre_zona = update_data['nombre_zona']
     
-    if zona.tipo_proceso is not None:
-        tipo_proceso = get_tipo_proceso_by_nombre(db, zona.tipo_proceso)
+    # Actualizar relaciones
+    if 'tipo_proceso' in update_data:
+        tipo_proceso = db.query(models.TipoProceso).filter(
+            models.TipoProceso.nombre == update_data['tipo_proceso']
+        ).first()
         if not tipo_proceso:
-            raise ValueError(f"Tipo de proceso {zona.tipo_proceso} no existe")
+            raise ValueError(f"Tipo de proceso {update_data['tipo_proceso']} no existe")
         db_zona.tipo_proceso_id = tipo_proceso.id
     
-    if zona.departamento is not None:
-        departamento = get_departamento_by_nombre(db, zona.departamento)
+    if 'departamento' in update_data:
+        departamento = db.query(models.Departamento).filter(
+            models.Departamento.nombre == update_data['departamento']
+        ).first()
         if not departamento:
-            raise ValueError(f"Departamento {zona.departamento} no existe")
+            raise ValueError(f"Departamento {update_data['departamento']} no existe")
         db_zona.departamento_id = departamento.id
     
-    if zona.geom is not None:
-        db_zona.geometry = WKTElement(zona.geom, srid=3116)
+    # Actualizar geometría
+    if 'geom' in update_data:
+        db_zona.geometry = WKTElement(update_data['geom'], srid=3116)
     
     db.commit()
     db.refresh(db_zona)
-    # Devolver los nombres en lugar de los objetos
+    
+    # Obtener los nombres actualizados de las relaciones
+    tipo_proceso = db_zona.tipo_proceso
+    departamento = db_zona.departamento
+    
     return {
         "id": db_zona.id,
         "nombre_zona": db_zona.nombre_zona,
-        "tipo_proceso": tipo_proceso.nombre,  # Nombre en lugar de objeto
-        "departamento": departamento.nombre,  # Nombre en lugar de objeto
-        "geom": zona.geom
+        "tipo_proceso": tipo_proceso.nombre,
+        "departamento": departamento.nombre,
+        "geom": update_data.get('geom')
     }
 
 def delete_zona_deforestada(db: Session, zona_id: int):
