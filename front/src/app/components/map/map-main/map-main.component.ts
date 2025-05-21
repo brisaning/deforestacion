@@ -217,6 +217,7 @@ export class MapMainComponent implements AfterViewInit  {
         this.form.controls['geom'].setValue(response.geom);
         this.updatePolygon(zona);
       });
+      this.id = event.target.value
       this.router.navigate(['/mapas', event.target.value]);
     }
   }
@@ -281,7 +282,8 @@ export class MapMainComponent implements AfterViewInit  {
             showConfirmButton: false,
             timer: 2000,
           });
-          setTimeout(() => {  location.reload(); }, 2000);
+          this.router.navigate(['/zonas']);
+          //setTimeout(() => {   }, 2000);
         });
       }
     });
@@ -290,7 +292,7 @@ export class MapMainComponent implements AfterViewInit  {
   onInfo(): void {
     Swal.fire({
       title: 'Información',
-      text: 'Debe elegir la herramienta de dibujo para crear o actulizar un polígono. Luego, haga clic en el botón para "Guardar" para que el campo "Poligono" contenga datos o los actualice.',
+      text: 'Debe elegir la herramienta de dibujo para crear o actulizar un polígono. Luego, haga clic en el botón para "Guardar" para que el campo "Polígono" contenga datos o los actualice.',
       icon: 'info',
       confirmButtonText: 'Cerrar'
     });
