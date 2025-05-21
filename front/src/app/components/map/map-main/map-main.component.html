@@ -13,8 +13,12 @@
         </div>
         <div class="col-6"></div>
         <div class="col-2">
-            <button *ngIf="!id" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newModal" [disabled]="isDisabled">Crear Nueva Zona</button>
-            <button *ngIf="id" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#newModal" [disabled]="isDisabled">Guardar Cambios</button>
+            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newModal">Guardar</button>
+                <button type="button" class="btn btn-secondary" (click)="onInfo()">?</button>
+            </div>
+            <!--button *ngIf="!id" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newModal" [disabled]="isDisabled">Crear Nueva Zona</button>
+            <button *ngIf="id" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#newModal" [disabled]="isDisabled">Guardar Cambios</button-->
         </div>
         
     </div>
@@ -58,8 +62,8 @@
                             </div>
                         </div>
                         <div class="form-floating mb-3">
-                            <input formControlName="geom" type="text" class="form-control" id="geom" placeholder="Geometría" readonly>
-                            <label for="geom" class="form-label">Geometría</label>
+                            <input formControlName="geom" type="text" class="form-control" id="geom" placeholder="Poligono" readonly>
+                            <label for="geom" class="form-label">Poligono</label>
                             <div  *ngIf="form.invalid && (form.dirty || form.touched)">
                                 <div *ngIf="form.get('geom').hasError('required')" class="danger-text">El campo es requerido</div>
                             </div>

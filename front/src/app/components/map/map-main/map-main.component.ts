@@ -128,7 +128,8 @@ export class MapMainComponent implements AfterViewInit  {
         rectangle: false,
         circle: false,
         marker: false
-      }
+      },
+      position: 'topright'
     });
     this.map.addControl(drawControl);
     
@@ -252,12 +253,47 @@ export class MapMainComponent implements AfterViewInit  {
           showConfirmButton: false,
           timer: 2000,
         });
-       // setTimeout(() => {  location.reload(); }, 2000);
+       setTimeout(() => {  location.reload(); }, 2000);
   
       });
     }
+  }
 
+  onDelete(): void {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: '¿Estás seguro de que deseas eliminar el registro?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.zonaService.deleteZona(this.id).subscribe((response: any) => {
+          Swal.fire({
+            title: 'Correcto!',
+            text: 'El Registro se eliminó correctamente',
+            icon: 'success',
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            timer: 2000,
+          });
+          setTimeout(() => {  location.reload(); }, 2000);
+        });
+      }
+    });
+  }
 
+  onInfo(): void {
+    Swal.fire({
+      title: 'Información',
+      text: 'Debe elegir la herramienta de dibujo para crear o actulizar un polígono. Luego, haga clic en el botón para "Guardar" para que el campo "Poligono" contenga datos o los actualice.',
+      icon: 'info',
+      confirmButtonText: 'Cerrar'
+    });
   }
   
 }
