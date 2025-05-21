@@ -26,15 +26,18 @@ export class ZonaService {
     return from(promise);
   }
 
-  createZona(zona: Zona) {
-    return this.api.post('zonas-deforestadas/', zona);
+  createZona(zona: Zona): Observable<Zona> {
+    const promise = this.api.post('zonas-deforestadas/', zona);
+    return from(promise);
   }
 
-  updateZona(id: number, zona: Zona) {
-    return this.api.put(`zonas-deforestadas/${id}`, zona);
+  updateZona(id: number, zona: Zona): Observable<Zona> {
+    const promise = this.api.put(`zonas-deforestadas/${id}`, zona);
+    return from(promise);
   }
 
-  deleteZona(id: number) {
-    return this.api.delete(`zonas-deforestadas/${id}`);
+  deleteZona(id: number): Observable<any> {
+    const promise = this.api.delete(`zonas-deforestadas/${id}`);
+    return from(promise);
   }
 }

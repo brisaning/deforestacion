@@ -1,13 +1,77 @@
 <div class="map-container">
-    <form>
-        <div class="mb-3">
-            <select class="form-select" (change)="changeZone($event)" aria-label="Default select example">
-                <option selected>Elija una zona</option>
-                <option *ngFor="let zone of zonas" [value]="zone.id" >{{zone.nombre_zona}}</option>
-            </select>
+    
+    <div class="row justify-content-end">
+        <div class="col-4">
+            <form>
+                <div class="mb-3">
+                    <select class="form-select" (change)="changeZone($event)" aria-label="Default select example">
+                        <option selected>Elija una zona</option>
+                        <option *ngFor="let zone of zonas" [value]="zone.id" >{{zone.nombre_zona}}</option>
+                    </select>
+                </div>
+            </form>
         </div>
-    </form>
+        <div class="col-6"></div>
+        <div class="col-2">
+            <button *ngIf="!id" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newModal" [disabled]="isDisabled">Crear Nueva Zona</button>
+            <button *ngIf="id" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#newModal" [disabled]="isDisabled">Guardar Cambios</button>
+        </div>
+        
+    </div>
     <div class="map-frame">
         <div id="map"></div>
     </div>
+    
+    <!-- Create Modal -->
+    <div class="modal fade" id="newModal" tabindex="-1" aria-labelledby="newModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="newModalLabel">Crear nuevo registro</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form [formGroup]="form">
+                        <div class="form-floating mb-3">
+                            <input formControlName="nombre_zona" type="text" class="form-control" id="nombre_zona" placeholder="Nombre de la Zona" required>
+                            <label for="nombre_zona" class="form-label">Nombre de la Zona</label>
+                            <div  *ngIf="form.invalid && (form.dirty || form.touched)">
+                                <div *ngIf="form.get('nombre_zona').hasError('required')" class="danger-text">El campo es requerido</div>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <select class="form-select" aria-label="Departamento" formControlName="departamento">
+                                <option *ngFor="let departamento of departamentos" value="{{departamento.nombre}}">{{departamento.nombre}}</option>
+                            </select>
+                            <label for="departamento" class="form-label">Departamento</label>
+                            <div  *ngIf="form.invalid && (form.dirty || form.touched)">
+                                <div *ngIf="form.get('departamento').hasError('required')" class="danger-text">El campo es requerido</div>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <select class="form-select" aria-label="Tipo de proceso" formControlName="tipo_proceso">
+                                <option *ngFor="let proceso of procesos" value="{{proceso.nombre}}">{{proceso.nombre}}</option>
+                            </select>
+                            <label for="tipo_proceso" class="form-label">Tipo de proceso</label>
+                            <div  *ngIf="form.invalid && (form.dirty || form.touched)">
+                                <div *ngIf="form.get('tipo_proceso').hasError('required')" class="danger-text">El campo es requerido</div>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input formControlName="geom" type="text" class="form-control" id="geom" placeholder="Geometría" readonly>
+                            <label for="geom" class="form-label">Geometría</label>
+                            <div  *ngIf="form.invalid && (form.dirty || form.touched)">
+                                <div *ngIf="form.get('geom').hasError('required')" class="danger-text">El campo es requerido</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="onSubmit()" [disabled]="form.invalid">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 </div>
