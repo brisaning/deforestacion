@@ -215,7 +215,7 @@ def update_zona_deforestada(db: Session, zona_id: int, zona_update: schemas.Zona
     }
 
 def delete_zona_deforestada(db: Session, zona_id: int):
-    db_zona = get_zona_deforestada(db, zona_id)
+    db_zona = db.query(models.ZonaDeforestada).filter(models.ZonaDeforestada.id == zona_id).first()
     if not db_zona:
         return None
     
