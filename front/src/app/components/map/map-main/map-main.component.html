@@ -14,7 +14,7 @@
         <div class="col-6"></div>
         <div class="col-2 d-flex align-items-end flex-column mb-2">
             <div class="btn-group mb-2" role="group" aria-label="Basic mixed styles example">
-                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#newModal">Guardar</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newModal">Guardar</button>
                 <button type="button" class="btn btn-secondary" (click)="onInfo()">?</button>
             </div>
             <button class="btn btn-danger" (click)="onDelete()">Eliminar</button>
@@ -69,9 +69,9 @@
                         </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <div class="modal-footer d-flex justify-content-center">
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="onSubmit()" [disabled]="form.invalid">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 </div>
             </div>
         </div>

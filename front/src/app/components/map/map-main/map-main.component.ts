@@ -266,8 +266,8 @@ export class MapMainComponent implements AfterViewInit  {
       text: '¿Estás seguro de que deseas eliminar el registro?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
@@ -283,7 +283,6 @@ export class MapMainComponent implements AfterViewInit  {
             timer: 2000,
           });
           this.router.navigate(['/zonas']);
-          //setTimeout(() => {   }, 2000);
         });
       }
     });
@@ -294,6 +293,7 @@ export class MapMainComponent implements AfterViewInit  {
       title: 'Información',
       text: 'Debe elegir la herramienta de dibujo para crear o actulizar un polígono. Luego, haga clic en el botón para "Guardar" para que el campo "Polígono" contenga datos o los actualice.',
       icon: 'info',
+      confirmButtonColor: '#3085d6',
       confirmButtonText: 'Cerrar'
     });
   }

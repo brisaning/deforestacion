@@ -11,19 +11,24 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 })
 export class ActionButtonComponent implements ICellRendererAngularComp {
   data: any;
+  onDelete!: (id: number) => void;
   constructor(private router: Router){}
 
   agInit(params: any): void {
-    console.log(params.data.id);
+    console.log(params);
     this.data = params;
+    this.onDelete = params.onDelete;
   }
   refresh(params: any) {
     return true;
   }
-  buttonClicked() {
-    console.log(this.data.data.id);
-
+  getMap() {
     this.router.navigate(['mapas/' + this.data.data.id]);
+  }
+
+  buttonDelete() {
+    const id: number = parseInt(this.data.data.id);
+    this.onDelete(id);
   }
 
 
